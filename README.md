@@ -1,21 +1,23 @@
 ***Docker image with ROS, Gazebo, Xfce4 VNC Desktop, and several robot packages***
 
-**Maintainer:** *Wail Gueaieb*
+**Maintainer:** *Sindhu Radhakrishnan*
 
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/wail-uottawa/docker-ros-elg5228/main)
-[![GitHub license](https://img.shields.io/github/license/wail-uottawa/docker-ros-elg5228)](https://github.com/wail-uottawa/docker-ros-elg5228/blob/master/LICENSE)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/neoavalon/docker-ros-elg5228/main)
+[![GitHub license](https://img.shields.io/github/license/neoavalon/docker-ros-elg5228)](https://github.com/neoavalon/docker-ros-elg5228/blob/main/LICENSE)
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
+- [Disclaimer](#disclaimer)
 - [Overview](#overview)
 - [Quick Startup](#quick-startup)
+    - [Docker Setup](#docker-setup)
+        - [Troubleshooting](#troubleshooting)
     - [Running the Image](#running-the-image)
-    - [Connecting to the Image by Running it on your Local Machine (Host)](#connecting-to-the-image-by-running-it-on-your-local-machine-host)
+    - [Connecting to the Image after Running it on your Local Machine (Host)](#connecting-to-the-image-by-running-it-on-your-local-machine-host)
         - [Connecting Through Web Browser](#connecting-through-web-browser)
         - [Connecting Through VNC Viewer](#connecting-through-vnc-viewer)
     - [Stopping the Image](#stopping-the-image)
-    - [Connecting to the Image by Running it on Ontario Research & Education VCL Cloud](#connecting-to-the-image-by-running-it-on-ontario-research--education-vcl-cloud)
 - [ROS Catkin Workspace](#ros-catkin-workspace)
 - [Installed Robots](#installed-robots)
     - [Fixed Manipulators](#fixed-manipulators)
@@ -42,10 +44,13 @@
             - [Example: Overriding the VNC resolution](#example-overriding-the-vnc-resolution)
         - [Mounting a local directory to the container](#mounting-a-local-directory-to-the-container)
 - [Acknowledgment](#acknowledgment)
-- [Disclaimer](#disclaimer)
 
 <!-- markdown-toc end -->
 
+# Disclaimer
+The main purpose of this repository and docker image is to facilitate instructors and researchers efforts in experimenting and conducting realistic simulations of various types of robotic systems. However, it comes with no warranty. Please use it at your own discretion. 
+
+I am no docker expert. It is very likely that the generated docker image and the provided `Dockerfile` are by no means optimal.
 
 # Overview
 
@@ -60,11 +65,37 @@ The Dockerfile is inspired by that of henry2423/docker-ros-vnc: [https://github.
   * Tensorflow and Jupyter are not installed.
   
 # Quick Startup
+
+The docker image referred to in this repository is built to run on x86_64 systems. Any such system (most laptops and desktops) running the docker service should be able to run the image. If you're running the container locally on your system, you'll need to have the docker service installed before attempting to run the image.
+
+## Docker Setup
+
+The setup of docker is beyond the scope of this guide, however if you are not familiar with docker and don't have it installed, refer to the following links for a guide how to get started. Which link you follow depends on the OS you have installed and your level of comfort on that OS. For casual users not familiar w/ docker, it is recommended to use Docker Desktop.
+* [For users running Linux](https://docs.docker.com/desktop/install/linux-install/) on their systems who want to install Docker Desktop
+* [For users running Windows](https://docs.docker.com/desktop/install/windows-install/) on their systems who want to install Docker Desktop
+* [For intermediate+ Linux users](https://docs.docker.com/engine/install/) who (dont want Docker Desktop) want to install the bare docker service
+
+### Troubleshooting
+
+When installing Docker Desktop on Windows systems, you may see a prompt regarding an incomplete WSL 2 installation, and that the WSL 2 Linux kernel is installed using a spearate MSI update package. Click "Restart" to complete this installation. If the same error repeats after restarting Docker Desktop, you'll need to manually install the update package from Microsoft. Visit the [Microsoft support page](https://learn.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package) and click on the link to download the latest package. Follow the steps to install. Close Docker Desktop and relaunch it. It may take a few connect attempts to see a green "Engine Running" notification in Docker Desktop.
+
+Post restart and login, you may get a prompt to accept a lincense agreement in order to use Docker Desktop. Accept it. The Docker Dashboard is auto enabled to pop up at startup, however Docker Desktop is not set to start automatically. You can adjust both of these bahaviours by opening Docker Desktop, clicking the gear icon along the top right of the window, then going to "General". One you've made the changes described below, click "Apply & Restart" to save them.
+	* You can select Docker Desktop to auto start by enabling "Start Docker Desktop when you log in"
+	* You can disable the auto open of the Docker Desktop Dashboard by unchecking "Open Docker Dashboard at startup"
+
 ## Running the Image
-Probably, the easiest way to run the docker image is to run the provided shell script file `docker-run.sh` at a command line while a docker server is running in the background. You may get the file `docker-run.sh` from the image's Github repository [https://github.com/wail-uottawa/docker-ros-elg5228](https://github.com/wail-uottawa/docker-ros-elg5228).
+
+The easiest way to run the docker image is to run the provided shell script file (`docker-run.sh` for Linux users or `docker-run.bat` for Windows users) at a command line while a docker server is running in the background. You may get the shell script file from [the image's Github repository](https://github.com/neoavalon/docker-ros-elg5228).
+
+<span style="color:red">**NOTE:**</span> The first time you run the script `docker-run.sh` (Linux) or `docker-run.bat` (Windows), it will take a relatively long time to pull the image [from the docker hub](https://hub.docker.com/r/realjsk/docker-ros-elg5228)), due to its large size. However, subsequent runs should be much faster since the image will be cached locally by docker. You will see a progress bar indicating how far along the image download is, after which you'll automatically by prompted w/ a shell inside the container you just launched.
 
 ---
-<span style="color:red">**WARNING (Use of Volumes):**</span> All changes made to any file/directory within the file system of a docker container are not permanent. They are lost once the container is stopped. To avoid this problem, the `docker-run.sh` script maps a local folder `~/MyGDrive/Docker-ELG5228/course_dir` on your computer onto another folder `/home/ros/catkin_ws/src/course_dir` in the docker container. It is highly recommended that you dedicate a local folder on your computer as a ROS working folder (e.g., throughout the course). It can have any name and path (for example: `/C/Courses/Mobile-robotics/ROS-Work` for Windows hosts or `/Users/john/ELG5228/ROS-Work` for Mac hosts). To be even safer, you might want to have this folder as part of a cloud drive that is automatically synchronized on your local machine (such as Google Drive, OneDrive, etc.) Inside the file `docker-run.sh`, replace `~/MyGDrive/Docker-ELG5228/course_dir` with the path to your dedicated local folder. That way, each time you run the docker image through `docker-run.sh` your local dedicated folder is automatically mapped onto `/home/ros/catkin_ws/src/course_dir` in the docker container. As such, whenever you make changes on your local dedicated folder or/and on `/home/ros/catkin_ws/src/course_dir` from within the container, those changes remain permanent on the local drive and are automatically made visible from within the container at `/home/ros/catkin_ws/src/course_dir` every time you run the image. 
+<span style="color:red">**WARNING (Use of Volumes):**</span> All changes made to any file/directory within the file system of a docker container are not permanent. They are lost once the container is stopped. To avoid this problem, the `docker-run.sh` and `docker-run.bat` scripts map a local folder `~/MyGDrive/Docker-ELG5228/course_dir` (Linux) or `C:/mobile_robotics/ros_work` (Windows) on your computer onto another folder `/home/ros/catkin_ws/src/course_dir` in the docker container. It is highly recommended that you dedicate a local folder on your computer as a ROS working folder (e.g., throughout the course). It can have any name and path (for example: `/C/Courses/Mobile-robotics/ROS-Work` for Windows hosts or `/Users/john/ELG5228/ROS-Work` for Mac hosts). To be even safer, you might want to have this folder as part of a cloud drive that is automatically synchronized on your local machine (such as Google Drive, OneDrive, etc.)
+
+* For Linux users, inside the file `docker-run.sh`, replace `~/MyGDrive/Docker-ELG5228/course_dir` with the path to your dedicated local folder.
+* For Windows users, inside the file `docker-run.bat`, replace `/C/mobile_robotics/ros_work` with the path to your dedicated local folder. Note the /C/ syntax to address your C<notextile>:</notextile>/ drive. If you have some other partitioning on your system, change the drive letter to reflect that.
+
+That way, each time you run the docker image through `docker-run.sh` or `docker-run.bat` your local dedicated folder is automatically mapped onto `/home/ros/catkin_ws/src/course_dir` in the docker container. As such, whenever you make changes on your local dedicated folder or/and on `/home/ros/catkin_ws/src/course_dir` from within the container, those changes remain permanent on the local drive and are automatically made visible from within the container at `/home/ros/catkin_ws/src/course_dir` every time you run the image. 
 
 To allow for more customization without having to rebuild the docker image, place the file `customization.bash` in the mapped drive in your host computer. It is sourced automatically in `.bashrc` when the docker image is fired. 
 
@@ -81,12 +112,10 @@ To allow for more customization without having to rebuild the docker image, plac
 ---
 
 ---
-<span style="color:red">**NOTE:**</span> The first time you run the script in `docker-run.sh`, it will take a relatively long time to pull the image from the docker hub ([https://hub.docker.com/r/realjsk/docker-ros-elg5228](https://hub.docker.com/r/realjsk/docker-ros-elg5228)), due to its large size. However, subsequent runs should be much faster since the image will be cached locally by docker.
 
----
+## Connecting to the Image after Running it on your Local Machine (Host)
 
-## Connecting to the Image by Running it on your Local Machine (Host)
-Successfully running `docker-run.sh` takes you to a shell command inside the image. However, this doesn't allow you to run graphical applications. To do so, while the image is running, you need to connect to it from your host machine either through a web browser or a VNC viewer, such as the free multi-platform tigerVNC Viewer ([https://tigervnc.org](https://tigervnc.org)).
+Successfully running `docker-run.sh` (Linux) or `docker-run.bat` (Windows) takes you to a shell command inside the image. However, this doesn't allow you to run graphical applications. To do so, while the image is running, you need to connect to it from your host machine either through a web browser or a VNC viewer, such as the free multi-platform tigerVNC Viewer ([https://tigervnc.org](https://tigervnc.org)).
 
 ### Connecting Through Web Browser
 Simply point your web browser to either of the following two URLs;
@@ -113,46 +142,6 @@ After finishing working with the docker image, and after properly disconnecting 
 * Graphically through Docker Desktop
 * From the command line on your host computer by running `docker stop IMAGE_ID:tag`, where `IMAGE_ID` and `tag` are the ID and tag of the image you want to stop(e.g., `docker stop docker-ros-elg5228:20210908`). Another way is to use the command `docker stop $(docker ps -a -q)`, which will stop *all* docker images running on your computer.
 
-## Connecting to the Image by Running it on Ontario Research & Education VCL Cloud
-<span style="color:red">**NOTE:**</span> This method of connecting to the image is only available to uOttawa affiliates. <br />
-Generally, it is prefered to run the image on your local computer. However, if it doesn't have enough CPU or memory power to run the image, you can run it on a virtual machine on Ontario Research & Education VCL Cloud. Access to the virtual machine is achieved in a few steps, from on-campus or off-campus devices alike. Since this is a remote connection, you may experience some delay depending on the speed of your internet connection and where you are connecting from. 
-
-1. Browse to the VCL portal: [https://orec.rdc.uottawa.ca](https://orec.rdc.uottawa.ca)
-2. Login:
-	* Select **University of Ottawa (Azure)**
-	* Login using your **uoAccess** credentials ([https://it.uottawa.ca/uoaccess](https://it.uottawa.ca/uoaccess))
-	* You will need to confirm your credentials using the MFA system 
-3. Make a New Reservation, selecting the image: **ELG5228_20210908**
-4. Wait for the environment to be initialized
-5. Once "Pending" has changed to "Connect"
-	* Hit "Connect" to obtain information to connect to your virtual machine 
-	* Take note of the **IP**, **UserID** and **Password** shown, as you will need them in the next step to open an SSH session
-6. Connect to the remote server using one of the following methods:
-	1. If you are connecting from a personnal computer running Windows, it is recommended that you connect to the server using **MobaXTerm** ([https://mobaxterm.mobatek.net](https://mobaxterm.mobatek.net)) by initiating an SSH connection (using the **IP**, **UserID** and **Password** shown earllier).
-	2. If you are connecting from a local machine running Linux or Mac OS, then connect to the server as follows:
-		* Esure that "X11 Forwarding" is enabled by entering `xhost +` at a terminal 
-		* At the same terminal, type `ssh -L 6901:localhost:6901 -Y UserID@IP` while substituting the **IP** and **UserID** shown earlier, as well as the **Password** when asked for it.
-	3. If you are connecting from a Windows computer in one of the computer labs in uOttawa's Faculty of Engineering, you may connect to the server via Bitvise/VcXsvr as follows:
-		* Start Menu / Utilities / VcXsrv 1.20.1.2 / XLaunch 
-			* Uncheck "Native OpenGL" if your ssh window dissapears on launch
-		* Start Menu / Bitvise SSH Client 8.34 / Bitvise SSH Client
-			* (Tab:Login) Login/Host: **IP**
-			* (Tab:Login) Authentication/Username: **UserID**
-			* (Tab:Terminal) X11 Forwarding: **Enable**
-			* (Tab:C2S)
-				* **Enabled**
-				* List. Port: **6901**
-				* Dest. Port: **6901**
-			* Hit "Login" at the bottom, accept the certificate and provide the **Password** when prompted
-7. Once you are connected to the server on the cloud, you can launch the docker image by running the command inside the file `docker-run.sh` as a sudo command (`sudo docker run ...`)
-8. To be able to run graphical applications, connect your computer to the docker image using one of the methods explained in sections [Connecting Through Web Browser](#connecting-through-web-browser) or [Connecting Through VNC Viewer](#connecting-through-vnc-viewer).
-9. Disconnecting from the virtal machine can easily be done through the graphical interface of the VCL portal ([https://orec.rdc.uottawa.ca](https://orec.rdc.uottawa.ca)). Under "Current Reservations", click the "Delete Reservation" icon. This is also done automatically once your session time expires. 
-
----
-<span style="color:red">**WARNING:**</span> Connecting to the image via Ontario Research & Education VCL Cloud does not allow mapping a local folder on your computer onto folder `/home/ros/catkin_ws/src/course_dir` in the docker image as it was explained in section [Running the Image](#running-the-image). The only way to avoid losing your work under `/home/ros/catkin_ws/src/course_dir` is to FTP all your fles/folders under this directory to your local computer BEFORE terminating the connection. This can be done using the FTP client installed on the image (see section [FTP Clients](#ftp-clients)). Forgetting or neglecting to do so will result in the loss of all your data under that folder. This is a major disadvantage of connecting to the image via Ontario Research & Education VCL Cloud, which is why this connection method should be left as a last resort.
-
----
-
 
 # ROS Catkin Workspace 
 The container comes with a catkin workspace already set up. By default, the path for the catkin workspace is  
@@ -160,7 +149,7 @@ The container comes with a catkin workspace already set up. By default, the path
 
 Some ROS packages are installed in the catkin workspace, including those of some of the robots listed in section [Installed Robots](#installed-robots).
 
-In order for users to write their own ROS packages without running the risk of interfering with the pre-installed packages in this catkin workspace, it is recommended to include all user packages inside the `src` directory of the catkin workspace in a mapped directory. This is already setup in the provided `docker-run.sh` file through the `--volume` option of the `docker run` command. You just need to edit it to override the path to the local drive in there (`~/MyGDrive/Docker-ELG5228/course_dir`) to the one of your choice, as explained in section [Running the Image](#running-the-image).
+In order for users to write their own ROS packages without running the risk of interfering with the pre-installed packages in this catkin workspace, it is recommended to include all user packages inside the `src` directory of the catkin workspace in a mapped directory. This is already setup in the provided `docker-run.sh` (Linux) or `docker-run.bat` (Windows) file through the `--volume` option of the `docker run` command. You just need to edit it to override the path to the local drive in there (`~/MyGDrive/Docker-ELG5228/course_dir`) to the one of your choice, as explained in section [Running the Image](#running-the-image).
 
 # Installed Robots
 The image comes loaded with pre-installed ROS packages for a number of robots.
@@ -242,10 +231,10 @@ Currently, the docker image lives in a Docker Hub repository [realjsk/docker-ros
 where `<tag>` is the tag you prefer to pull. A list of available tags is found at [https://hub.docker.com/r/realjsk/docker-ros-elg5228/tags](https://hub.docker.com/r/realjsk/docker-ros-elg5228/tags). For instance, you can replace `<tag>` in the above command by `20210908`.
 
 ## Building the Docker Image Locally
-The source files to build the docker image on a local computer are stored at the Github repository [https://github.com/wail-uottawa/docker-ros-elg5228](https://github.com/wail-uottawa/docker-ros-elg5228).
+The source files to build the docker image on a local computer are stored at the Github repository [https://github.com/neoavalon/docker-ros-elg5228](https://github.com/neoavalon/docker-ros-elg5228).
 
 1. Start by cloning the repository:  
-   `git clone https://github.com/wail-uottawa/docker-ros-elg5228.git`
+   `git clone https://github.com/neoavalon/docker-ros-elg5228.git`
 2. Then, cd to the directory including the file `Dockerfile` and (with the docker server running) build the image:  
    `docker build --squash -t name:<tag>  .` (note the dot at the end)  
    where `name` and `<tag>` are the name and tag you want to give to the built image.  
@@ -320,12 +309,10 @@ Docker enables the mapping between directories on the host system and the contai
 You can learn more about volumes on this designated [docker reference page](https://docs.docker.com/storage/volumes/).
 
 # Acknowledgment
+
+This repository is a fork of Prof. Wail Guaeib's original repository [wail-uottawa/docker-ros-elg5228](https://github.com/wail-uottawa/docker-ros-elg5228) w/ running changes added to support semesters where I am teaching ELG5228.
+
 Credit goes primarily to the maintainers of the following projects:
 
 * [henry2423/docker-ros-vnc](https://github.com/henry2423/docker-ros-vnc) - developed the base Dockerfile used for this image
-* [ConSol/docker-headless-vnc-container](https://github.com/ConSol/docker-headless-vnc-container) - developed the ConSol/docker-headless-vnc-container
-
-# Disclaimer
-The main purpose of this repository and docker image is to facilitate instructors and researchers efforts in experimenting and conducting realistic simulations of various types of robotic systems. However, it comes with no warranty. Please use it at your own discretion. 
-
-I am no docker expert. It is very likely that the generated docker image and the provided `Dockerfile` are by no means optimal. 
+* [ConSol/docker-headless-vnc-container](https://github.com/ConSol/docker-headless-vnc-container) - developed the ConSol/docker-headless-vnc-container 
